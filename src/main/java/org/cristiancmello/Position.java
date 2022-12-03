@@ -14,4 +14,8 @@ public class Position {
     public double getX() {
         return x;
     }
+
+    public void decX() {
+        x = x - 1;
+    }
 }

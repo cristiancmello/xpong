@@ -1,21 +1,28 @@
 package org.cristiancmello;
 
 public class Ball {
-    private boolean hasBeenThrown;
     private Position position;
+
     private Direction direction;
+
     private Speed speed;
+
+    private BallStatus ballStatus;
+
+    public Ball() {
+        this.ballStatus = BallStatus.STOPPED;
+    }
 
     public void throwFrom(Position initialPosition, Direction direction, Speed speed) {
         this.position = initialPosition;
         this.direction = direction;
         this.speed = speed;
 
-        hasBeenThrown = true;
+        ballStatus = BallStatus.THROWN;
     }
 
     public boolean hasBeenThrown() {
-        return hasBeenThrown;
+        return ballStatus == BallStatus.THROWN;
     }
 
     public Position getPosition() {
@@ -30,9 +37,34 @@ public class Ball {
         return speed;
     }
 
-    public void ride() {
-        if (!hasBeenThrown) throw new BallCannotRideException("No side because The Ball never Thrown");
+    public void changeDirection(Direction direction) {
+        if (!hasBeenStopped()) throw new RuntimeException("Cannot change direction without stop");
 
-        position.incX();
+        this.direction = direction;
+    }
+
+    public boolean hasBeenStopped() {
+        return ballStatus == BallStatus.STOPPED;
+    }
+
+    public boolean hasBeenRolling() {
+        return ballStatus == BallStatus.ROLLING;
+    }
+
+    public void roll() {
+        if (!hasBeenThrown()) throw new BallCannotRollException("Cannot roll because never has been thrown");
+
+        ballStatus = BallStatus.ROLLING;
+
+        if (direction == Direction.RIGHT) {
+            position.incX();
+        } else if (direction == Direction.LEFT) {
+            position.decX();
+        }
+
+    }
+
+    public void stop() {
+        ballStatus = BallStatus.STOPPED;
     }
 }

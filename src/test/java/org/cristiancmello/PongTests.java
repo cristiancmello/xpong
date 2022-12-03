@@ -1,19 +1,20 @@
 package org.cristiancmello;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class PongTests {
-    /* MinPong: despreze regras, a ideia de jogo em si, pense apenas na parte "física", das colisões, a bola */
-    /*
-        1.
-           Ball: *
-           Action 'throwFrom(initialPosition, direction, speed)'
-           ?      hasBeenThrown
-    */
+    @Test
+    void givenBall_whenAskDefaultStatus_thenBeStopped() {
+        var ball = new Ball();
+
+        assertThat(ball.hasBeenStopped()).isTrue();
+        assertThat(ball.hasBeenThrown()).isFalse();
+        assertThat(ball.hasBeenRolling()).isFalse();
+    }
+
     @Test
     void givenBall_whenBallThrowFromWithInitialPositionDirectionSpeed_thenHasBeenThrown() {
         var ball = new Ball();
@@ -23,21 +24,25 @@ public class PongTests {
 
         ball.throwFrom(initialPosition, direction, speed);
 
-        assertThat(ball.hasBeenThrown()).isEqualTo(true);
+        assertThat(ball.hasBeenThrown()).isTrue();
+        assertThat(ball.hasBeenStopped()).isFalse();
+        assertThat(ball.hasBeenRolling()).isFalse();
         assertThat(ball.getPosition()).isEqualTo(initialPosition);
         assertThat(ball.getDirection()).isEqualTo(direction);
         assertThat(ball.getSpeed()).isEqualTo(speed);
     }
 
     @Test
-    void givenBall_whenAskRideWithoutThrown_thenExceptionNoRide() {
+    void givenBall_whenBallRollWithoutThrown_thenExceptionNoRoll() {
         var ball = new Ball();
 
-        assertThrows(BallCannotRideException.class, ball::ride, "No can Ride because The Ball never thrown");
+        assertThatExceptionOfType(BallCannotRollException.class)
+            .isThrownBy(ball::roll)
+            .withMessage("Cannot roll because never has been thrown");
     }
 
     @Test
-    void givenBallThrown_whenAskRideRightDirection_thenShouldRideRightDirection() {
+    void givenBallThrown_whenBallRollRightDirection_thenShouldRollingRightDirection() {
         var ball = new Ball();
         var initialPositionX = 1.0;
         var initialPosition = new Position(initialPositionX);
@@ -48,8 +53,101 @@ public class PongTests {
 
         assertThat(ball.getPosition().getX()).isEqualTo(initialPositionX);
 
-        ball.ride();
+        ball.roll();
 
+        assertThat(ball.hasBeenRolling()).isTrue();
+        assertThat(ball.hasBeenStopped()).isFalse();
+        assertThat(ball.hasBeenThrown()).isFalse();
         assertThat(ball.getPosition().getX()).isGreaterThan(initialPositionX);
+    }
+
+    @Test
+    void givenBallThrown_whenBallRollLeftDirection_thenShouldRollingLeftDirection() {
+        var ball = new Ball();
+        var initialPositionX = 1.0;
+        var initialPosition = new Position(initialPositionX);
+        var direction = Direction.LEFT;
+        var speed = new Speed();
+
+        ball.throwFrom(initialPosition, direction, speed);
+
+        assertThat(ball.getPosition().getX()).isEqualTo(initialPositionX);
+
+        ball.roll();
+
+        assertThat(ball.hasBeenRolling()).isTrue();
+        assertThat(ball.hasBeenStopped()).isFalse();
+        assertThat(ball.hasBeenThrown()).isFalse();
+        assertThat(ball.getPosition().getX()).isLessThan(initialPositionX);
+    }
+
+    @Test
+    void givenBallThrown_whenChangeDirectionWhileRollingWithoutStop() {
+        var ball = new Ball();
+        var initialPositionX = 1.0;
+        var initialPosition = new Position(initialPositionX);
+        var direction = Direction.RIGHT;
+        var speed = new Speed();
+
+        ball.throwFrom(initialPosition, direction, speed);
+        ball.roll();
+
+        assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> {
+                ball.changeDirection(Direction.LEFT);
+            }).withMessage("Cannot change direction without stop");
+
+        assertThat(ball.getDirection()).isEqualTo(Direction.RIGHT);
+    }
+
+    @Test
+    void givenBallThrown_whenRollAndStopped_thenStopped() {
+        var ball = new Ball();
+        var initialPositionX = 1.0;
+        var initialPosition = new Position(initialPositionX);
+        var direction = Direction.RIGHT;
+        var speed = new Speed();
+
+        ball.throwFrom(initialPosition, direction, speed);
+        ball.roll();
+        ball.stop();
+
+        assertThat(ball.hasBeenStopped()).isTrue();
+        assertThat(ball.hasBeenThrown()).isFalse();
+        assertThat(ball.hasBeenRolling()).isFalse();
+    }
+
+    @Test
+    void givenBallThown_whenChangeDirectionToLeft_thenDirectionIsLeft() {
+        var ball = new Ball();
+        var initialPositionX = 1.0;
+        var initialPosition = new Position(initialPositionX);
+        var direction = Direction.RIGHT;
+        var speed = new Speed();
+
+        ball.throwFrom(initialPosition, direction, speed);
+        ball.roll();
+        ball.stop();
+
+        ball.changeDirection(Direction.LEFT);
+
+        assertThat(ball.getDirection()).isEqualTo(Direction.LEFT);
+    }
+
+    @Test
+    void givenBallThown_whenChangeDirectionToRight_thenDirectionIsRight() {
+        var ball = new Ball();
+        var initialPositionX = 1.0;
+        var initialPosition = new Position(initialPositionX);
+        var direction = Direction.LEFT;
+        var speed = new Speed();
+
+        ball.throwFrom(initialPosition, direction, speed);
+        ball.roll();
+        ball.stop();
+
+        ball.changeDirection(Direction.RIGHT);
+
+        assertThat(ball.getDirection()).isEqualTo(Direction.RIGHT);
     }
 }
