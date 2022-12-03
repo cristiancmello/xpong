@@ -24,3 +24,14 @@ test {
 jacocoTestReport {
     dependsOn test // tests are required to run before generating the report
 }
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.cristiancmello.Main'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
