@@ -1,29 +1,38 @@
 package org.cristiancmello;
 
 public class Ball {
-    private int positionX;
-    private int finalPositionX;
-    private int initialPositionX;
+    private boolean hasBeenThrown;
+    private Position position;
+    private Direction direction;
+    private Speed speed;
 
-    public void go(int initialPositionX) {
-        this.initialPositionX = initialPositionX;
-        this.finalPositionX = 1;
-        this.positionX = finalPositionX;
+    public void throwFrom(Position initialPosition, Direction direction, Speed speed) {
+        this.position = initialPosition;
+        this.direction = direction;
+        this.speed = speed;
+
+        hasBeenThrown = true;
     }
 
-    public void setPositionX(int positionX) {
-        this.positionX = positionX;
+    public boolean hasBeenThrown() {
+        return hasBeenThrown;
     }
 
-    public int getPositionX() {
-        return positionX;
+    public Position getPosition() {
+        return position;
     }
 
-    public int getInitialPositionX() {
-        return initialPositionX;
+    public Direction getDirection() {
+        return direction;
     }
 
-    public int getFinalPositionX() {
-        return finalPositionX;
+    public Speed getSpeed() {
+        return speed;
+    }
+
+    public void ride() {
+        if (!hasBeenThrown) throw new BallCannotRideException("No side because The Ball never Thrown");
+
+        position.incX();
     }
 }

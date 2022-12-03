@@ -1,4 +1,5 @@
 package org.cristiancmello;
 
-public class Direction {
+public enum Direction {
+    RIGHT
 }
