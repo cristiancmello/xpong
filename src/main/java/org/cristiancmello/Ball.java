@@ -52,7 +52,7 @@ public class Ball {
     }
 
     public void roll() {
-        if (!hasBeenThrown()) throw new BallCannotRollException("Cannot roll because never has been thrown");
+        if (!hasBeenThrown() && !hasBeenRolling()) throw new BallCannotRollException("Cannot roll because never has been thrown");
 
         ballStatus = BallStatus.ROLLING;
 

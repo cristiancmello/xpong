@@ -150,4 +150,44 @@ public class PongTests {
 
         assertThat(ball.getDirection()).isEqualTo(Direction.RIGHT);
     }
+
+    @Test
+    void givenBallThrown_whenRollTwiceToLeft_thenRollTwiceLeft() {
+        var ball = new Ball();
+        var initialPositionX = 2.0;
+        var initialPosition = new Position(initialPositionX);
+        var direction = Direction.LEFT;
+        var speed = new Speed();
+
+        ball.throwFrom(initialPosition, direction, speed);
+        ball.roll();
+
+        assertThat(ball.getPosition().getX()).isLessThan(initialPositionX);
+
+        var positionX = ball.getPosition().getX();
+
+        ball.roll();
+
+        assertThat(ball.getPosition().getX()).isLessThan(positionX);
+    }
+
+    @Test
+    void givenBallThrown_whenRollTwiceToRight_thenRollTwiceRight() {
+        var ball = new Ball();
+        var initialPositionX = 2.0;
+        var initialPosition = new Position(initialPositionX);
+        var direction = Direction.RIGHT;
+        var speed = new Speed();
+
+        ball.throwFrom(initialPosition, direction, speed);
+        ball.roll();
+
+        assertThat(ball.getPosition().getX()).isGreaterThan(initialPositionX);
+
+        var positionX = ball.getPosition().getX();
+
+        ball.roll();
+
+        assertThat(ball.getPosition().getX()).isGreaterThan(positionX);
+    }
 }
